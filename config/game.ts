@@ -6,7 +6,7 @@ export const BOOSTER_THRESHOLD = 200;
 export const BOOSTER_DURATION_MS = 3000;
 export const BASE_SPAWN_INTERVAL_MS = 700;
 export const MAX_SPEED_MULTIPLIER = 2.5;
-export const BASE_FALL_PX_PER_SEC = 180;
+export const BASE_FALL_PX_PER_SEC = 100;
 export const BEST_SCORE_KEY = 'make-it-rain:best';
 
 export const SCORES: Record<DropKind, number> = {

@@ -9,7 +9,7 @@ interface DropProps {
 }
 
 const SHAPE: Record<DropType['kind'], string> = {
-  coin: 'w-9 h-9 rounded-full border-2 border-yellow-500 bg-yellow-300 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100',
+  coin: 'w-12 h-12 rounded-full border-2 border-yellow-500 bg-yellow-300 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100',
   bill: 'w-14 h-8 rounded border-2 border-green-500 bg-green-200 dark:bg-green-700 text-green-900 dark:text-green-100',
   gold: 'w-14 h-9 rounded-lg border-[3px] border-double border-amber-600 bg-amber-200 dark:bg-amber-700 text-amber-900 dark:text-amber-100',
   'bubble-s': 'w-9 h-9 rounded-full border-2 border-dashed border-sky-400 bg-sky-100/70 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300',
