@@ -30,7 +30,6 @@ export function useGameLoop() {
   const [finalStats, setFinalStats] = useState<GameStats>({ ...EMPTY_STATS });
 
   // Refs — mutation without re-render during RAF
-  const phaseRef = useRef<Phase>('menu');
   const scoreRef = useRef(0);
   const dropsRef = useRef<Drop[]>([]);
   const statsRef = useRef<GameStats>({ ...EMPTY_STATS });
@@ -69,7 +68,6 @@ export function useGameLoop() {
     }
     resetRound();
     setPhase('countdown');
-    phaseRef.current = 'countdown';
     setCountdown(COUNTDOWN_SEC);
   }, [resetRound]);
 
@@ -80,7 +78,6 @@ export function useGameLoop() {
     }
     resetRound();
     setPhase('countdown');
-    phaseRef.current = 'countdown';
     setCountdown(COUNTDOWN_SEC);
   }, [resetRound]);
 
@@ -91,7 +88,6 @@ export function useGameLoop() {
     }
     resetRound();
     setPhase('menu');
-    phaseRef.current = 'menu';
   }, [resetRound]);
 
   // Countdown ticks
@@ -101,7 +97,6 @@ export function useGameLoop() {
       if (countdown === 1) {
         setCountdown(null);
         setPhase('playing');
-        phaseRef.current = 'playing';
       } else {
         setCountdown(countdown - 1);
       }
@@ -138,7 +133,6 @@ export function useGameLoop() {
         boosterEndsAtRef.current = null;
         setBoosterActive(false);
         setPhase('result');
-        phaseRef.current = 'result';
         return;
       }
 
