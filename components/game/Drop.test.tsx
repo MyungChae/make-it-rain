@@ -9,7 +9,6 @@ function makeDrop(overrides: Partial<DropType> = {}): DropType {
     kind: 'coin',
     xPct: 50,
     yPx: 100,
-    vyPxPerSec: 180,
     spawnedAt: 0,
     ...overrides,
   };

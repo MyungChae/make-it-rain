@@ -1,4 +1,4 @@
-import { SPAWN_WEIGHTS_NORMAL, SPAWN_WEIGHTS_BOOSTER, BASE_FALL_PX_PER_SEC } from '@/config/game';
+import { SPAWN_WEIGHTS_NORMAL, SPAWN_WEIGHTS_BOOSTER } from '@/config/game';
 import type { Drop, DropKind } from '@/types/game';
 
 type SpawnMode = 'normal' | 'booster';
@@ -21,7 +21,6 @@ export function createDrop(now: number, kind: DropKind, xPct?: number): Drop {
     kind,
     xPct: xPct ?? Math.random() * 90,
     yPx: 0,
-    vyPxPerSec: BASE_FALL_PX_PER_SEC,
     spawnedAt: now,
   };
 }

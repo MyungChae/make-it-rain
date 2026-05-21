@@ -6,7 +6,6 @@ export interface Drop {
   kind: DropKind;
   xPct: number;
   yPx: number;
-  vyPxPerSec: number;
   spawnedAt: number;
   dying?: boolean;
 }

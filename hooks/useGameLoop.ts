@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   COUNTDOWN_SEC,
   ROUND_SEC,
+  BOARD_HEIGHT,
   SCORES,
   BASE_SPAWN_INTERVAL_MS,
   MAX_SPEED_MULTIPLIER,
@@ -13,8 +14,6 @@ import {
 import { pickKind, createDrop, spawnIntervalAt, fallSpeedAt } from '@/lib/spawner';
 import { countCrossedThresholds } from '@/lib/score';
 import type { Phase, Drop, GameStats } from '@/types/game';
-
-export const BOARD_HEIGHT = 480;
 
 const EMPTY_STATS: GameStats = { coin: 0, bill: 0, gold: 0, 'bubble-s': 0, 'bubble-l': 0 };
 

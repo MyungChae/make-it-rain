@@ -1,5 +1,6 @@
 'use client';
 
+import { BOARD_HEIGHT } from '@/config/game';
 import { Drop } from '@/components/game/Drop';
 import type { Drop as DropType } from '@/types/game';
 
@@ -14,9 +15,10 @@ interface GameBoardProps {
 export function GameBoard({ children, countdown, boosterActive, drops = [], onClickDrop }: GameBoardProps) {
   return (
     <div
-      className={`relative overflow-hidden h-[min(70vh,640px)] border rounded-lg bg-muted/10 ${
+      className={`relative overflow-hidden border rounded-lg bg-muted/10 ${
         boosterActive ? 'border-foreground ring-2 ring-ring' : 'border-dashed border-border'
       }`}
+      style={{ height: BOARD_HEIGHT }}
     >
       {boosterActive && (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-0.5 border border-foreground rounded-full bg-background whitespace-nowrap tracking-wider z-10">
