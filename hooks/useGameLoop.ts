@@ -38,11 +38,15 @@ export function useGameLoop() {
   const lastBoosterThresholdRef = useRef(0);
   const boosterEndsAtRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
+  const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const roundStartRef = useRef(0);
   const lastSpawnRef = useRef(0);
   const lastFrameRef = useRef(0);
 
   const resetRound = useCallback(() => {
+    // Clear any pending drop-removal timeouts from previous round
+    for (const t of pendingTimeoutsRef.current) clearTimeout(t);
+    pendingTimeoutsRef.current = [];
     setScore(0);
     scoreRef.current = 0;
     setTimeLeftSec(ROUND_SEC);
@@ -225,10 +229,11 @@ export function useGameLoop() {
 
     // Remove after animation
     const delay = drop.kind.startsWith('bubble') ? 200 : 150;
-    setTimeout(() => {
+    const t = setTimeout(() => {
       dropsRef.current = dropsRef.current.filter(d => d.id !== id);
       setDrops([...dropsRef.current]);
     }, delay);
+    pendingTimeoutsRef.current.push(t);
   }, []);
 
   const activateBooster = useCallback(() => {

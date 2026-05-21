@@ -11,13 +11,13 @@
 | Task | 상태 | 완료 기준 |
 |---|---|---|
 | Task 1 — 메뉴 + 최고 점수 | ✅ 완료 | 11개 테스트(storage 6 + MenuScreen 5) 통과, 빌드 성공 |
-| Task 2 — 카운트다운 + HUD/보드 골격 | 🔲 대기 | — |
-| Task 3 — 객체 낙하·클릭·땅 도달 | 🔲 대기 | — |
-| Task 4 — 시간 가속 + 라운드 종료 + 결과 화면 | 🔲 대기 | — |
-| Task 5 — 최고점 갱신 + 다시하기 + 메뉴 이동 | 🔲 대기 | — |
-| Task 6 — 부스터 충전 | 🔲 대기 | — |
-| Task 7 — 부스터 발동 + 중첩 방지 | 🔲 대기 | — |
-| Task 8 — 테마·반응형·접근성·E2E | 🔲 대기 | — |
+| Task 2 — 카운트다운 + HUD/보드 골격 | ✅ 완료 | 6개 테스트 통과, 빌드 성공 |
+| Task 3 — 객체 낙하·클릭·땅 도달 | ✅ 완료 | spawner/score/Drop/GameBoard/useGameLoop 구현, 93개 테스트 통과 |
+| Task 4 — 시간 가속 + 라운드 종료 + 결과 화면 | ✅ 완료 | spawnIntervalAt/fallSpeedAt 선형 가속, ResultScreen, 93개 테스트 통과 |
+| Task 5 — 최고점 갱신 + 다시하기 + 메뉴 이동 | ✅ 완료 | recordIfBest 연결, restart/toMenu, NEW BEST 배지, 93개 테스트 통과 |
+| Task 6 — 부스터 충전 | ✅ 완료 | countCrossedThresholds, useGameLoop 부스터 충전 로직, 93개 테스트 통과 |
+| Task 7 — 부스터 발동 + 중첩 방지 | ✅ 완료 | activateBooster, boosterEndsAt RAF 체크, spawner booster mode, 93개 테스트 통과 |
+| Task 8 — 테마·반응형·접근성·E2E | ✅ 완료 | enableSystem, 반응형 보드, 44px hitbox, E2E smoke/game spec |
 
 ## 아키텍처 결정
 
