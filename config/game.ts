@@ -3,7 +3,7 @@ import type { DropKind } from '@/types/game';
 export const ROUND_SEC = 60;
 export const BOARD_HEIGHT = 480;
 export const COUNTDOWN_SEC = 3;
-export const BOOSTER_THRESHOLD = 100;
+export const BOOSTER_THRESHOLD = 150;
 export const BOOSTER_DURATION_MS = 3000;
 export const BASE_SPAWN_INTERVAL_MS = 700;
 export const MAX_SPEED_MULTIPLIER = 2.5;

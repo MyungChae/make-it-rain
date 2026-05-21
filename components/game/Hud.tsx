@@ -1,7 +1,5 @@
 'use client';
 
-import { Zap } from 'lucide-react';
-
 interface HudProps {
   score: number;
   timeLeftSec: number;
@@ -34,7 +32,7 @@ export function Hud({ score, timeLeftSec, boosters = 0, boosterActive = false, o
           data-active={boosterActive ? '' : undefined}
           className="flex items-center gap-1 px-2 py-1 border border-border rounded text-xs data-[active]:ring-2 data-[active]:ring-ring disabled:opacity-35 disabled:cursor-not-allowed"
         >
-          <Zap className="w-3 h-3" />
+          <span className="text-base leading-none">⛽</span>
           <span>{boosterActive ? '활성중' : `× ${boosters}`}</span>
         </button>
       </div>
