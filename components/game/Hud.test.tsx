@@ -25,9 +25,9 @@ describe('Hud', () => {
     expect(onBooster).toHaveBeenCalledOnce();
   });
 
-  it('shows "활성중" and disables button when boosterActive', () => {
+  it('shows "⚡ 활성중!" and disables button when boosterActive', () => {
     render(<Hud score={0} timeLeftSec={60} boosters={1} boosterActive={true} />);
-    expect(screen.getByText('활성중')).toBeInTheDocument();
+    expect(screen.getByText('⚡ 활성중!')).toBeInTheDocument();
     expect(screen.getByRole('button')).toBeDisabled();
   });
 

@@ -24,17 +24,29 @@ export function Hud({ score, timeLeftSec, boosters = 0, boosterActive = false, o
       </div>
 
       <div className="flex flex-col items-center gap-0.5">
-        <span className="text-xs text-muted-foreground">BOOSTER</span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-muted-foreground">BOOSTER</span>
+          <span
+            className="text-[9px] text-muted-foreground/60 hidden sm:inline"
+            title="누르면 3초간 돈 폭발!"
+          >
+            ·3초간 돈 폭발
+          </span>
+        </div>
         <button
           type="button"
           onClick={onBooster}
           disabled={boosterDisabled}
           data-active={boosterActive ? '' : undefined}
-          className="flex items-center gap-1 px-2 py-1 border border-border rounded text-xs data-[active]:ring-2 data-[active]:ring-ring disabled:opacity-35 disabled:cursor-not-allowed"
+          title="누르면 3초간 돈이 더 많이 떨어집니다!"
+          className="flex items-center gap-1 px-2 py-1 border border-border rounded text-xs data-[active]:ring-2 data-[active]:ring-ring data-[active]:border-orange-400 disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
         >
           <span className="text-base leading-none">⛽</span>
-          <span>{boosterActive ? '활성중' : `× ${boosters}`}</span>
+          <span className={boosterActive ? 'text-orange-400 font-bold' : ''}>
+            {boosterActive ? '⚡ 활성중!' : `× ${boosters}`}
+          </span>
         </button>
+        <span className="text-[9px] text-muted-foreground/50 sm:hidden">누르면 3초간 돈 폭발</span>
       </div>
     </div>
   );
