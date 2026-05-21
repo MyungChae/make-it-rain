@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe: make-it-rain</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --w-bg: #f5f5f5;
+    --w-border: #ccc;
+    --w-text: #555;
+    --w-muted: #aaa;
+    --w-fill: #eee;
+  }
+
+  * {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--w-text);
+  }
+
+  body { background: var(--w-bg); }
+
+  nav { position: sticky; top: 0; z-index: 40; background: var(--w-bg); border-bottom: 1px solid var(--w-border); }
+  nav button { cursor: pointer; font-size: 13px; }
+  nav button:hover { background: var(--w-fill); border-radius: 4px; }
+  nav button.active { font-weight: bold; border-bottom: 2px solid var(--w-text); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .vp-toggle button {
+    font-size: 12px; padding: 2px 8px;
+    border: 1px solid var(--w-border); cursor: pointer; background: white;
+  }
+  .vp-toggle button:first-child { border-radius: 4px 0 0 4px; }
+  .vp-toggle button:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+  .vp-toggle button.active { background: var(--w-text); color: white; }
+
+  body.viewport-mobile .screen-content {
+    max-width: 375px !important;
+    margin: 24px auto !important;
+    border: 2px solid var(--w-border);
+    border-radius: 24px;
+    min-height: 667px;
+    background: white;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 28px 14px !important;
+  }
+
+  .screen-notes {
+    background: #fffde7;
+    border-left: 3px solid #ffd54f;
+    padding: 10px 14px;
+    margin-top: 16px;
+    font-size: 13px;
+    border-radius: 0 4px 4px 0;
+  }
+  .screen-notes summary { cursor: pointer; font-weight: bold; font-size: 12px; color: #b0a050; text-transform: uppercase; letter-spacing: 0.05em; }
+  .screen-notes p { margin: 4px 0 2px; color: #777; }
+  .screen-notes ul { margin: 4px 0 0 16px; padding: 0; color: #777; }
+  .screen-notes li { margin: 2px 0; }
+
+  /* Scenario sub-nav */
+  .s-nav { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .s-nav button { font-size: 11px; padding: 2px 7px; border: 1px solid var(--w-border); border-radius: 3px; cursor: pointer; background: white; }
+  .s-nav button:hover { background: var(--w-fill); }
+  .s-nav button.active { background: var(--w-text); color: white; border-color: var(--w-text); }
+
+  /* Game board */
+  .w-board {
+    position: relative;
+    background: var(--w-fill);
+    border: 1px dashed var(--w-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .w-board.w-board-boost {
+    border: 2px solid var(--w-text);
+    box-shadow: 0 0 0 2px var(--w-text);
+  }
+  .w-board-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--w-text); }
+
+  .w-token { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--w-border); background: white; font-size: 11px; color: var(--w-text); user-select: none; }
+  .w-token-coin   { width: 36px; height: 36px; border-radius: 50%; }
+  .w-token-bill   { width: 52px; height: 30px; border-radius: 4px; }
+  .w-token-gold   { width: 56px; height: 36px; border-radius: 6px; border-style: double; border-width: 3px; }
+  .w-token-bubble-s { width: 32px; height: 32px; border-radius: 50%; border-style: dashed; }
+  .w-token-bubble-l { width: 56px; height: 56px; border-radius: 50%; border-style: dashed; }
+  .w-drop { position: absolute; }
+
+  .w-countdown { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 120px; font-weight: bold; color: var(--w-text); }
+
+  /* Booster HUD button */
+  .w-boost-btn { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border: 1px solid var(--w-border); border-radius: 4px; font-size: 11px; cursor: pointer; background: white; }
+  .w-boost-btn.w-off { opacity: 0.35; cursor: not-allowed; }
+
+  /* Booster mode overlay */
+  .w-boost-label { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; padding: 1px 10px; border: 1px solid var(--w-text); background: white; border-radius: 10px; white-space: nowrap; letter-spacing: 0.05em; }
+</style>
+</head>
+<body class="p-0 m-0 viewport-mobile">
+
+<nav class="flex items-center gap-4 px-6 py-2">
+  <span class="text-xs" style="color:var(--w-muted)">wireframe: make-it-rain</span>
+  <button id="nav-0" onclick="show(0)" class="px-2 py-1">1. 메뉴</button>
+  <button id="nav-1" onclick="show(1)" class="px-2 py-1">2. 카운트다운</button>
+  <button id="nav-2" onclick="show(2)" class="px-2 py-1">3. 게임 보드</button>
+  <button id="nav-3" onclick="show(3)" class="px-2 py-1">4. 결과</button>
+  <div class="vp-toggle flex ml-auto">
+    <button id="vp-desktop" onclick="setViewport('desktop')">Desktop</button>
+    <button id="vp-mobile" onclick="setViewport('mobile')" class="active">Mobile</button>
+  </div>
+</nav>
+
+<!-- ========================= -->
+<!-- Screen 0: 메뉴             -->
+<!-- ========================= -->
+<div id="screen-0" class="screen">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-3" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      메뉴 화면
+    </h2>
+
+    <div class="s-nav">
+      <button data-s="scenario-1a" onclick="setScenario(0,'scenario-1a')">최고점 없음 (1a)</button>
+      <button data-s="scenario-1b" onclick="setScenario(0,'scenario-1b')">최고점 있음 (1b)</button>
+    </div>
+
+    <div class="flex flex-col items-center justify-center gap-6 py-8 @md:py-14">
+      <!-- 게임 제목 -->
+      <div class="text-center">
+        <div class="text-xs mb-2" style="color:var(--w-muted)">CASUAL GAME</div>
+        <div class="text-4xl @md:text-6xl font-bold tracking-wider">MAKE IT RAIN</div>
+        <div class="text-sm mt-3" style="color:var(--w-muted)">하늘에서 떨어지는 돈을 잡아라</div>
+      </div>
+
+      <!-- 최고점 영역 — scenario-1b에서만 표시 -->
+      <div data-for="scenario-1b" class="hidden flex flex-col items-center gap-1 px-6 py-3 border rounded" style="border-color:var(--w-border)">
+        <div class="text-xs uppercase tracking-wider" style="color:var(--w-muted)">최고 점수</div>
+        <div class="text-3xl font-bold">1,240</div>
+      </div>
+
+      <!-- 시작 버튼 -->
+      <button class="px-10 py-4 text-lg font-bold border-2 rounded-lg" style="border-color:var(--w-text); background:white;">
+        <i data-lucide="play" class="inline-block w-5 h-5 align-middle mr-2"></i>
+        시작
+      </button>
+
+      <!-- 룰 요약 -->
+      <div class="text-xs text-center max-w-xs leading-relaxed" style="color:var(--w-muted)">
+        60초 동안 떨어지는 돈을 클릭해 점수를 모으세요.<br>
+        비누방울을 잘못 누르면 점수가 깎입니다.
+      </div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>게임 진입 첫 화면. 최고점 확인 후 게임 시작.</p>
+        <ul>
+          <li>트리거: 페이지 진입 직후 또는 결과 화면 "메뉴로" 클릭</li>
+          <li>인터랙션: "시작" 버튼 클릭 → 카운트다운 화면으로 전환</li>
+          <li>1a (최고점 없음): 최고점 블록 숨김 / 1b (최고점 있음): "1,240" 표시</li>
+          <li>전환: 시작 버튼 → Screen 2 (카운트다운)</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- Screen 1: 카운트다운        -->
+<!-- ========================= -->
+<div id="screen-1" class="screen">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-4" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      카운트다운 화면
+    </h2>
+
+    <!-- HUD: SCORE · TIME · BOOSTER 3분할 -->
+    <div class="flex items-center justify-between mb-3 px-1">
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">SCORE</span>
+        <span class="text-xl font-bold">0</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">TIME</span>
+        <span class="text-xl font-bold">60</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">BOOSTER</span>
+        <div class="w-boost-btn w-off">
+          <i data-lucide="zap" class="w-3 h-3"></i>
+          <span>× 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 게임 보드 + 중앙 카운트다운 -->
+    <div class="w-board" style="height: 420px;">
+      <div class="w-countdown">3</div>
+      <div class="w-board-ground"></div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>3 → 2 → 1 카운트다운. 1초 간격으로 숫자가 바뀐 뒤 게임 시작.</p>
+        <ul>
+          <li>트리거: 메뉴 "시작" 클릭 또는 결과 화면 "다시하기" 클릭</li>
+          <li>인터랙션: 사용자 조작 없음 (자동 진행)</li>
+          <li>전환: 카운트다운 종료 → Screen 3 (게임 보드)</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- Screen 2: 게임 보드         -->
+<!-- ========================= -->
+<div id="screen-2" class="screen">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-3" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      게임 보드
+    </h2>
+
+    <div class="s-nav">
+      <button data-s="scenario-3" onclick="setScenario(2,'scenario-3')">진행중 (3-6)</button>
+      <button data-s="scenario-11" onclick="setScenario(2,'scenario-11')">부스터 충전 (11)</button>
+      <button data-s="scenario-12" onclick="setScenario(2,'scenario-12')">부스터 발동 (12-13)</button>
+    </div>
+
+    <!-- HUD: scenario-3/4/5/6 (기본, 부스터 0개) -->
+    <div data-for="scenario-3 scenario-4 scenario-5 scenario-6" class="hidden flex items-center justify-between mb-3 px-1">
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">SCORE</span>
+        <span class="text-xl font-bold">85</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">TIME</span>
+        <span class="text-xl font-bold">42</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">BOOSTER</span>
+        <div class="w-boost-btn w-off">
+          <i data-lucide="zap" class="w-3 h-3"></i>
+          <span>× 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD: scenario-11 (부스터 1개 충전됨) -->
+    <div data-for="scenario-11" class="hidden flex items-center justify-between mb-3 px-1">
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">SCORE</span>
+        <span class="text-xl font-bold">205</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">TIME</span>
+        <span class="text-xl font-bold">35</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">BOOSTER</span>
+        <div class="w-boost-btn">
+          <i data-lucide="zap" class="w-3 h-3"></i>
+          <span>× 1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD: scenario-12/13 (부스터 모드 발동 중) -->
+    <div data-for="scenario-12 scenario-13" class="hidden flex items-center justify-between mb-3 px-1">
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">SCORE</span>
+        <span class="text-xl font-bold">240</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">TIME</span>
+        <span class="text-xl font-bold">28</span>
+      </div>
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs" style="color:var(--w-muted)">BOOSTER</span>
+        <div class="w-boost-btn w-off">
+          <i data-lucide="zap" class="w-3 h-3"></i>
+          <span>활성중</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 게임 보드 -->
+    <div id="game-board" class="w-board" style="height: 370px;">
+
+      <!-- 부스터 모드 레이블 (scenario-12/13만) -->
+      <div data-for="scenario-12 scenario-13" class="hidden w-boost-label">⚡ BOOSTER MODE ▸ 2.8s</div>
+
+      <!-- 돈 객체 (항상 표시) -->
+      <div class="w-drop" style="left:14%; top:8%;">
+        <div class="w-token w-token-coin">+5</div>
+      </div>
+      <div class="w-drop" style="left:60%; top:18%;">
+        <div class="w-token w-token-bill">+15</div>
+      </div>
+      <div class="w-drop" style="left:38%; top:36%;">
+        <div class="w-token w-token-gold">+50</div>
+      </div>
+      <div class="w-drop" style="left:78%; top:50%;">
+        <div class="w-token w-token-coin">+5</div>
+      </div>
+
+      <!-- 비누방울 (일반 + 부스터 충전 시에만 — 발동 중에는 새 비누방울 생성 안 됨) -->
+      <div data-for="scenario-3 scenario-4 scenario-5 scenario-6 scenario-11" class="hidden w-drop" style="left:22%; top:30%;">
+        <div class="w-token w-token-bubble-s">-5</div>
+      </div>
+      <div data-for="scenario-3 scenario-4 scenario-5 scenario-6 scenario-11" class="hidden w-drop" style="left:50%; top:60%;">
+        <div class="w-token w-token-bubble-l">-20</div>
+      </div>
+      <div data-for="scenario-3 scenario-4 scenario-5 scenario-6 scenario-11" class="hidden w-drop" style="left:8%; top:64%;">
+        <div class="w-token w-token-bubble-s">-5</div>
+      </div>
+
+      <!-- 부스터 모드 추가 동전 (scenario-12/13 — 동전 대량 생성) -->
+      <div data-for="scenario-12 scenario-13" class="hidden w-drop" style="left:5%; top:22%;">
+        <div class="w-token w-token-coin">+5</div>
+      </div>
+      <div data-for="scenario-12 scenario-13" class="hidden w-drop" style="left:28%; top:10%;">
+        <div class="w-token w-token-bill">+15</div>
+      </div>
+      <div data-for="scenario-12 scenario-13" class="hidden w-drop" style="left:52%; top:5%;">
+        <div class="w-token w-token-coin">+5</div>
+      </div>
+      <div data-for="scenario-12 scenario-13" class="hidden w-drop" style="left:84%; top:32%;">
+        <div class="w-token w-token-coin">+5</div>
+      </div>
+      <div data-for="scenario-12 scenario-13" class="hidden w-drop" style="left:70%; top:70%;">
+        <div class="w-token w-token-coin">+5</div>
+      </div>
+
+      <div class="w-board-ground"></div>
+    </div>
+
+    <!-- 객체 범례 -->
+    <div class="mt-2 flex flex-wrap gap-3 text-xs" style="color:var(--w-muted)">
+      <span>● 동전 +5</span>
+      <span>▭ 지폐 +15</span>
+      <span>▬ 금괴 +50</span>
+      <span>○ 작은 비누 -5</span>
+      <span>◯ 큰 비누 -20</span>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>플레이 중 메인 화면. HUD는 SCORE · TIME · BOOSTER 3분할.</p>
+        <ul>
+          <li>트리거: 카운트다운 종료 직후</li>
+          <li>인터랙션: 돈 클릭 → 점수 증가·객체 사라짐 / 비누방울 클릭 → 점수 감소·터지는 효과 / 미클릭 객체는 땅 도달 시 사라짐</li>
+          <li>부스터 버튼: 보유 0 → 비활성(w-off) / 보유 1+ → 클릭 가능 / 모드 발동 중 → "활성중" 비활성 + 클릭 무효 (13)</li>
+          <li>부스터 모드 발동 (12-13): 보드 테두리 강조 + "⚡ BOOSTER MODE" 레이블 + 비누방울 새 생성 없음</li>
+          <li>전환: TIME=0 → Screen 4 (결과)</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- Screen 3: 결과              -->
+<!-- ========================= -->
+<div id="screen-3" class="screen">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-3" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      결과 화면
+    </h2>
+
+    <div class="s-nav">
+      <button data-s="scenario-7" onclick="setScenario(3,'scenario-7')">라운드 종료 (7)</button>
+      <button data-s="scenario-8a" onclick="setScenario(3,'scenario-8a')">최고점 갱신 (8a)</button>
+      <button data-s="scenario-8b" onclick="setScenario(3,'scenario-8b')">최고점 미갱신 (8b)</button>
+    </div>
+
+    <div class="flex flex-col items-center gap-4 py-3">
+      <!-- 라운드 종료 -->
+      <div class="text-xs uppercase tracking-widest" style="color:var(--w-muted)">ROUND OVER</div>
+
+      <!-- 최종 점수 -->
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-xs" style="color:var(--w-muted)">최종 점수</div>
+        <!-- scenario-7, 8a: 320 -->
+        <div data-for="scenario-7 scenario-8a" class="hidden text-6xl @md:text-7xl font-bold">320</div>
+        <!-- scenario-8b: 80 (직전 최고점 100보다 낮음) -->
+        <div data-for="scenario-8b" class="hidden text-6xl @md:text-7xl font-bold">80</div>
+      </div>
+
+      <!-- 최고점 갱신 배지 — scenario-8a에서만 표시 -->
+      <div data-for="scenario-8a" class="hidden px-3 py-1 border-2 rounded-full text-xs font-bold tracking-wider" style="border-color:var(--w-text);">
+        ★ NEW BEST
+      </div>
+
+      <!-- 종류별 잡은 개수 -->
+      <div class="w-full max-w-md">
+        <div class="text-xs mb-2 text-center" style="color:var(--w-muted)">잡은 개수</div>
+        <div class="grid grid-cols-2 @md:grid-cols-5 gap-2">
+          <div class="flex flex-col items-center gap-1 p-2 border rounded" style="border-color:var(--w-border)">
+            <div class="w-token w-token-coin">+5</div>
+            <div class="text-lg font-bold">12</div>
+            <div class="text-xs" style="color:var(--w-muted)">동전</div>
+          </div>
+          <div class="flex flex-col items-center gap-1 p-2 border rounded" style="border-color:var(--w-border)">
+            <div class="w-token w-token-bill">+15</div>
+            <div class="text-lg font-bold">8</div>
+            <div class="text-xs" style="color:var(--w-muted)">지폐</div>
+          </div>
+          <div class="flex flex-col items-center gap-1 p-2 border rounded" style="border-color:var(--w-border)">
+            <div class="w-token w-token-gold">+50</div>
+            <div class="text-lg font-bold">3</div>
+            <div class="text-xs" style="color:var(--w-muted)">금괴</div>
+          </div>
+          <div class="flex flex-col items-center gap-1 p-2 border rounded" style="border-color:var(--w-border)">
+            <div class="w-token w-token-bubble-s">-5</div>
+            <div class="text-lg font-bold">2</div>
+            <div class="text-xs" style="color:var(--w-muted)">작은 비누</div>
+          </div>
+          <div class="flex flex-col items-center gap-1 p-2 border rounded" style="border-color:var(--w-border)">
+            <div class="w-token w-token-bubble-l">-20</div>
+            <div class="text-lg font-bold">1</div>
+            <div class="text-xs" style="color:var(--w-muted)">큰 비누</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 액션 버튼 -->
+      <div class="flex gap-3 mt-2">
+        <button class="px-6 py-3 text-base font-bold border-2 rounded-lg" style="border-color:var(--w-text); background:white;">
+          <i data-lucide="rotate-ccw" class="inline-block w-4 h-4 align-middle mr-2"></i>
+          다시하기
+        </button>
+        <button class="px-6 py-3 text-base font-bold border rounded-lg" style="border-color:var(--w-border); background:white; color:var(--w-muted);">
+          <i data-lucide="home" class="inline-block w-4 h-4 align-middle mr-2"></i>
+          메뉴로
+        </button>
+      </div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>라운드 종료 직후. 점수·통계·다음 행동 한 화면에서 제공.</p>
+        <ul>
+          <li>트리거: 게임 보드에서 TIME=0 도달</li>
+          <li>인터랙션: "다시하기" → Screen 2 (카운트다운) / "메뉴로" → Screen 1 (메뉴)</li>
+          <li>8a (최고점 갱신): 이번 320 > 직전 최고점 → "★ NEW BEST" 배지 표시</li>
+          <li>8b (최고점 미갱신): 이번 80 < 직전 최고점 100 → 배지 없음</li>
+          <li>음수 점수 종료 시 최고점에 기록 안 됨 (배지 없음)</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var screenIds = [];
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+function setViewport(mode) {
+  document.body.classList.remove('viewport-mobile', 'viewport-desktop');
+  document.body.classList.add('viewport-' + mode);
+  document.querySelectorAll('.vp-toggle button').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('vp-' + mode).classList.add('active');
+}
+
+function setScenario(screenId, scenario) {
+  var screen = document.getElementById('screen-' + screenId);
+  screen.dataset.scenario = scenario;
+
+  screen.querySelectorAll('.s-nav button').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.s === scenario);
+  });
+
+  screen.querySelectorAll('[data-for]').forEach(function(el) {
+    var list = el.dataset.for.split(' ');
+    if (list.indexOf(scenario) !== -1) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+
+  // 부스터 모드일 때 보드 강조
+  var board = document.getElementById('game-board');
+  if (board) {
+    board.classList.toggle('w-board-boost', scenario === 'scenario-12' || scenario === 'scenario-13');
+  }
+
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) {
+    screenIds.push(parseInt(b.id.replace('nav-', '')));
+  });
+
+  // 각 화면의 초기 시나리오 설정
+  setScenario(0, 'scenario-1a');
+  setScenario(2, 'scenario-3');
+  setScenario(3, 'scenario-7');
+
+  var first = document.querySelector('nav button[id^="nav-"]');
+  if (first) first.click();
+
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>

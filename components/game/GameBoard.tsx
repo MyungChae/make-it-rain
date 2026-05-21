@@ -1,12 +1,17 @@
 'use client';
 
+import { Drop } from '@/components/game/Drop';
+import type { Drop as DropType } from '@/types/game';
+
 interface GameBoardProps {
   children?: React.ReactNode;
   countdown?: number | null;
   boosterActive?: boolean;
+  drops?: DropType[];
+  onClickDrop?: (id: string) => void;
 }
 
-export function GameBoard({ children, countdown, boosterActive }: GameBoardProps) {
+export function GameBoard({ children, countdown, boosterActive, drops = [], onClickDrop }: GameBoardProps) {
   return (
     <div
       className={`relative overflow-hidden h-[480px] border rounded-lg bg-muted/10 ${
@@ -23,6 +28,9 @@ export function GameBoard({ children, countdown, boosterActive }: GameBoardProps
           <span className="text-[120px] font-bold leading-none text-foreground/80">{countdown}</span>
         </div>
       )}
+      {drops.map(drop => (
+        <Drop key={drop.id} drop={drop} onClick={onClickDrop ?? (() => {})} />
+      ))}
       {children}
       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground/40" />
     </div>
