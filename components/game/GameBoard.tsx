@@ -14,7 +14,7 @@ interface GameBoardProps {
 export function GameBoard({ children, countdown, boosterActive, drops = [], onClickDrop }: GameBoardProps) {
   return (
     <div
-      className={`relative overflow-hidden h-[480px] border rounded-lg bg-muted/10 ${
+      className={`relative overflow-hidden h-[min(70vh,640px)] border rounded-lg bg-muted/10 ${
         boosterActive ? 'border-foreground ring-2 ring-ring' : 'border-dashed border-border'
       }`}
     >

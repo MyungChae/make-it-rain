@@ -37,23 +37,26 @@ export const Drop = React.memo(function Drop({ drop, onClick }: DropProps) {
       className="absolute"
       style={{ left: `${drop.xPct}%`, top: `${drop.yPx}px` }}
     >
-      <button
-        type="button"
-        onClick={handleClick}
-        aria-label={drop.kind}
-        data-testid={`drop-${drop.id}`}
-        data-kind={drop.kind}
-        className={[
-          'flex items-center justify-center text-[10px] font-bold cursor-pointer select-none',
-          'transition-all duration-150',
-          drop.dying && isBubble ? 'scale-150 opacity-0' : drop.dying ? 'scale-75 opacity-0' : '',
-          SHAPE[drop.kind],
-        ]
-          .filter(Boolean)
-          .join(' ')}
-      >
-        {LABEL[drop.kind]}
-      </button>
+      {/* Invisible 44×44 min hit area wrapper satisfies mobile tap target rule */}
+      <div className="flex items-center justify-center min-w-[44px] min-h-[44px]">
+        <button
+          type="button"
+          onClick={handleClick}
+          aria-label={drop.kind}
+          data-testid={`drop-${drop.id}`}
+          data-kind={drop.kind}
+          className={[
+            'flex items-center justify-center text-[10px] font-bold cursor-pointer select-none',
+            'transition-all duration-150',
+            drop.dying && isBubble ? 'scale-150 opacity-0' : drop.dying ? 'scale-75 opacity-0' : '',
+            SHAPE[drop.kind],
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
+          {LABEL[drop.kind]}
+        </button>
+      </div>
     </div>
   );
 });

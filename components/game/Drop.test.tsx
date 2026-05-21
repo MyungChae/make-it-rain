@@ -59,9 +59,16 @@ describe('Drop', () => {
     const { container } = render(
       <Drop drop={makeDrop({ xPct: 30, yPx: 120 })} onClick={() => {}} />,
     );
+    // outer position wrapper
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.style.left).toBe('30%');
     expect(wrapper.style.top).toBe('120px');
+  });
+
+  it('hit area wrapper meets 44px minimum', () => {
+    const { container } = render(<Drop drop={makeDrop()} onClick={() => {}} />);
+    const hitWrapper = container.querySelector('.min-w-\\[44px\\]') as HTMLElement;
+    expect(hitWrapper).toBeInTheDocument();
   });
 
   it('renders data-kind attribute on button', () => {
